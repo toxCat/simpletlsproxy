@@ -2,7 +2,7 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 36
 
 Example on how to start hidden Redmine service under Fedora
 
-version: '3.7'
+ersion: '3.7'
 
 services:
 
@@ -23,6 +23,7 @@ services:
       MYSQL_DATABASE: redmine
     volumes:
       - "./mariadb:/var/lib/mysql:z"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
   tor:
     image: jess/tor
@@ -38,3 +39,5 @@ services:
     volumes:
       - "./tls:/tls:z"
     command: app redmine:3000 :4333
+
+
