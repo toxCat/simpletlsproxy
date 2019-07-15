@@ -9,8 +9,6 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 36
 ## write docker-compose.yml
 
 ```docker-compose
-ersion: '3.7'
-
 services:
 
   redmine:
@@ -38,13 +36,13 @@ services:
     user: root
     volumes:
       - "./tor_volumes:/hs:z"
-    command: tor --allow-missing-torrc --ignore-missing-torrc HiddenServiceDir /hs HiddenServicePort "443 tls:4333"
+    command: tor --allow-missing-torrc --ignore-missing-torrc HiddenServiceDir /hs HiddenServicePort "443 tls:4433"
 
   tls:
     build: "github.com/AnimusPEXUS/simpletlsproxy.git"
     restart: always
     volumes:
       - "./tls:/tls:z"
-    command: app redmine:3000 :4333
+    command: app redmine:3000 :4433
 
 ```
