@@ -1,7 +1,14 @@
+# Example on how to start hidden Redmine service under Fedora
+
+## Generate self-signed certificate inside ./tls directory
+
+```bash
 openssl req -nodes -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+```
 
-Example on how to start hidden Redmine service under Fedora
+## write docker-compols.yml
 
+```docker-compose
 ersion: '3.7'
 
 services:
@@ -40,4 +47,4 @@ services:
       - "./tls:/tls:z"
     command: app redmine:3000 :4333
 
-
+```
