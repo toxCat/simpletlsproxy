@@ -57,7 +57,7 @@ func main() {
 		log.Fatal("error: ", err)
 	}
 
-	certificate, err := tls.LoadX509KeyPair("/tls/key.pem", "/tls/cert.crt")
+	certificate, err := tls.LoadX509KeyPair("/tls/key.pem", "/tls/cert.pem")
 	if err != nil {
 		log.Fatal("error loading keyfile or certificate: ", err)
 	}
