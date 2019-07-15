@@ -6,7 +6,7 @@
 openssl req -nodes -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 ```
 
-## write docker-compols.yml
+## write docker-compose.yml
 
 ```docker-compose
 ersion: '3.7'
