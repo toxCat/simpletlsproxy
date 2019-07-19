@@ -85,8 +85,12 @@ func main() {
 				log.Fatalf("error dialing %v: %v", caddr, err)
 			}
 
+			defer client.Close()
+
 			g := sync.WaitGroup{}
 			g.Add(2)
+
+			defer g.Wait()
 
 			go func() {
 				defer g.Done()
@@ -103,8 +107,6 @@ func main() {
 					log.Fatalf("error streaming from %v: %v", caddr, err)
 				}
 			}()
-
-			g.Wait()
 
 		}(conn, tls_cfg)
 	}
