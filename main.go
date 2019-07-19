@@ -126,7 +126,10 @@ func main() {
 			}()
 
 			go func() {
-				defer g.Done()
+				defer func() {
+					g.Done()
+					log.Printf(" (%d) copier exited client -> tls_srv")
+				}()
 				_, err = io.Copy(tls_srv, client)
 				if err != nil {
 					log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
@@ -134,7 +137,10 @@ func main() {
 			}()
 
 			go func() {
-				defer g.Done()
+				defer func() {
+					g.Done()
+					log.Printf(" (%d) copier exited tls_srv -> client ")
+				}()
 				_, err = io.Copy(client, tls_srv)
 				if err != nil {
 					log.Fatalf(" (%d) error streaming from %v: %v", conn_id, caddr, err)
