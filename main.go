@@ -85,7 +85,10 @@ func main() {
 				log.Fatalf("error dialing %v: %v", caddr, err)
 			}
 
-			defer client.Close()
+			defer func() {
+				client.Close()
+				conn.Close()
+			}()
 
 			g := sync.WaitGroup{}
 			g.Add(2)
