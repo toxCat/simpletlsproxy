@@ -71,11 +71,18 @@ func main() {
 		log.Fatal("error serving: ", err)
 	}
 
+	m := sync.Mutex{}
+
 	for {
+
+		m.Lock()
+
 		conn, err := ln.Accept()
 		if err != nil {
 			log.Fatal("error accepting inbound connection: ", err)
 		}
+
+		m.Unlock()
 
 		go func(conn net.Conn, tls_cfg *tls.Config) {
 			tls_srv := tls.Server(conn, tls_cfg)
