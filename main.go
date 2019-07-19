@@ -128,7 +128,7 @@ func main() {
 			go func() {
 				defer func() {
 					g.Done()
-					log.Printf(" (%d) copier exited client -> tls_srv")
+					log.Printf(" (%d) copier exited client -> tls_srv", conn_id)
 				}()
 				_, err = io.Copy(tls_srv, client)
 				if err != nil {
@@ -139,7 +139,7 @@ func main() {
 			go func() {
 				defer func() {
 					g.Done()
-					log.Printf(" (%d) copier exited tls_srv -> client ")
+					log.Printf(" (%d) copier exited tls_srv -> client", conn_id)
 				}()
 				_, err = io.Copy(client, tls_srv)
 				if err != nil {
