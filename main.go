@@ -89,7 +89,6 @@ func main() {
 
 		conn, err := ln.Accept()
 		if err != nil {
-			m.Unlock()
 			log.Fatal("error accepting inbound connection: ", err)
 		}
 
