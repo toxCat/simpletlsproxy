@@ -61,7 +61,7 @@ func main() {
 	}
 
 	log.Print("going to listening on ", saddr)
-	log.Print("connections will be TLS proxied to", caddr)
+	log.Print("connections will be TLS proxied to ", caddr)
 
 	certificate, err := tls.LoadX509KeyPair("/tls/cert.pem", "/tls/key.pem")
 	if err != nil {
@@ -81,15 +81,11 @@ func main() {
 
 	log.Print("listening socket opened")
 
-	m := sync.Mutex{}
-
 	log.Print("accepting loop begins")
 
 	var conn_id uint64 = 0
 
 	for {
-
-		m.Lock()
 
 		conn, err := ln.Accept()
 		if err != nil {
@@ -100,8 +96,6 @@ func main() {
 		conn_id += 1
 
 		log.Printf("accepted connection (%d) %v", conn_id, conn.RemoteAddr())
-
-		m.Unlock()
 
 		go func(conn_id uint64, conn net.Conn, tls_cfg *tls.Config) {
 			tls_srv := tls.Server(conn, tls_cfg)
