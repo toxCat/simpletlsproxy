@@ -83,6 +83,8 @@ func main() {
 
 	log.Print("accepting loop begins")
 
+	var waiters_count uint64
+
 	var conn_id uint64 = 0
 
 	for {
@@ -112,14 +114,17 @@ func main() {
 			g := sync.WaitGroup{}
 			g.Add(2)
 
+			waiters_count += 2
+
 			defer func() {
-				log.Printf(" waiting %d end", conn_id)
+				log.Printf(" waiting %d end (still waiting for %d)", conn_id, waiters_count)
 				g.Wait()
-				log.Printf(" waiting %d end done", conn_id)
+				log.Printf(" waiting %d end done (still waiting for %d)", conn_id, waiters_count)
 			}()
 
 			go func() {
 				defer func() {
+					waiters_count -= 1
 					g.Done()
 					log.Printf(" (%d) copier exited client -> tls_srv", conn_id)
 				}()
@@ -131,6 +136,7 @@ func main() {
 
 			go func() {
 				defer func() {
+					waiters_count -= 1
 					g.Done()
 					log.Printf(" (%d) copier exited tls_srv -> client", conn_id)
 				}()
