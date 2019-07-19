@@ -52,15 +52,23 @@ func getaddrs() (*net.TCPAddr, *net.TCPAddr, error) {
 
 func main() {
 
+	log.Print("Welcome to Simple TLS proxy")
+	log.Print("https://github.com/AnimusPEXUS/simpletlsproxy")
+
 	saddr, caddr, err := getaddrs()
 	if err != nil {
 		log.Fatal("error: ", err)
 	}
 
+	log.Print("going to listening on ", saddr)
+	log.Print("connections will be TLS proxied to", caddr)
+
 	certificate, err := tls.LoadX509KeyPair("/tls/cert.pem", "/tls/key.pem")
 	if err != nil {
 		log.Fatal("error loading keyfile or certificate: ", err)
 	}
+
+	log.Print("TLS certificate loaded")
 
 	tls_cfg := &tls.Config{
 		Certificates: []tls.Certificate{certificate},
@@ -71,7 +79,13 @@ func main() {
 		log.Fatal("error serving: ", err)
 	}
 
+	log.Print("listening socket opened")
+
 	m := sync.Mutex{}
+
+	log.Print("accepting loop begins")
+
+	var conn_id uint64 = 0
 
 	for {
 
@@ -83,14 +97,18 @@ func main() {
 			log.Fatal("error accepting inbound connection: ", err)
 		}
 
+		conn_id += 1
+
+		log.Printf("accepted connection (%d) %v", conn_id, conn.RemoteAddr())
+
 		m.Unlock()
 
-		go func(conn net.Conn, tls_cfg *tls.Config) {
+		go func(conn_id uint64, conn net.Conn, tls_cfg *tls.Config) {
 			tls_srv := tls.Server(conn, tls_cfg)
 
 			client, err := net.DialTCP("tcp", nil, caddr)
 			if err != nil {
-				log.Fatalf("error dialing %v: %v", caddr, err)
+				log.Fatalf(" (%d) error dialing %v: %v", conn_id, caddr, err)
 			}
 
 			defer func() {
@@ -101,13 +119,17 @@ func main() {
 			g := sync.WaitGroup{}
 			g.Add(2)
 
-			defer g.Wait()
+			defer func() {
+				log.Printf(" waiting %d end", conn_id)
+				g.Wait()
+				log.Printf(" waiting %d end done", conn_id)
+			}()
 
 			go func() {
 				defer g.Done()
 				_, err = io.Copy(tls_srv, client)
 				if err != nil {
-					log.Fatalf("error streaming to %v: %v", caddr, err)
+					log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
 				}
 			}()
 
@@ -115,11 +137,11 @@ func main() {
 				defer g.Done()
 				_, err = io.Copy(client, tls_srv)
 				if err != nil {
-					log.Fatalf("error streaming from %v: %v", caddr, err)
+					log.Fatalf(" (%d) error streaming from %v: %v", conn_id, caddr, err)
 				}
 			}()
 
-		}(conn, tls_cfg)
+		}(conn_id, conn, tls_cfg)
 	}
 
 }
