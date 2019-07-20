@@ -85,6 +85,7 @@ func main() {
 	log.Print("accepting loop begins")
 
 	var waiters_count uint64
+	waiters_count_m := sync.Mutex{}
 
 	var conn_id uint64 = 0
 
@@ -120,7 +121,9 @@ func main() {
 			g := sync.WaitGroup{}
 			g.Add(2)
 
+			waiters_count_m.Lock()
 			waiters_count += 2
+			waiters_count_m.Unlock()
 
 			defer func() {
 				log.Printf(" waiting %d end (still waiting for %d)", conn_id, waiters_count)
@@ -130,7 +133,9 @@ func main() {
 
 			go func() {
 				defer func() {
+					waiters_count_m.Lock()
 					waiters_count -= 1
+					waiters_count_m.Unlock()
 					g.Done()
 					log.Printf(" (%d) copier exited tls_srv -> client", conn_id)
 				}()
@@ -142,7 +147,9 @@ func main() {
 
 			go func() {
 				defer func() {
+					waiters_count_m.Lock()
 					waiters_count -= 1
+					waiters_count_m.Unlock()
 					g.Done()
 					log.Printf(" (%d) copier exited client -> tls_srv", conn_id)
 				}()
