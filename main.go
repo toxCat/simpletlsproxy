@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"time"
 )
 
 func getaddrs() (*net.TCPAddr, *net.TCPAddr, error) {
@@ -87,8 +88,6 @@ func main() {
 
 	var conn_id uint64 = 0
 
-	m := sync.Mutex{}
-
 	for {
 
 		conn, err := ln.Accept()
@@ -103,19 +102,19 @@ func main() {
 		go func(conn_id uint64, conn net.Conn, tls_cfg *tls.Config) {
 			tls_srv := tls.Server(conn, tls_cfg)
 
-			m.Lock()
-			client, err := net.DialTCP("tcp", nil, caddr)
+			client, err := net.DialTimeout("tcp", caddr.String(), time.Duration(10*time.Second))
 			if err != nil {
 				log.Fatalf(" (%d) error dialing %v: %v", conn_id, caddr, err)
 			}
-
-			m.Unlock()
 
 			defer func() {
 				client.Close()
 				tls_srv.Close()
 				conn.Close()
 			}()
+
+			tls_srv.SetDeadline(time.Now().Add(30 * time.Second))
+			client.SetDeadline(time.Now().Add(30 * time.Second))
 
 			g := sync.WaitGroup{}
 			g.Add(2)
