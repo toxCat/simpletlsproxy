@@ -87,6 +87,8 @@ func main() {
 
 	var conn_id uint64 = 0
 
+	m := sync.Mutex{}
+
 	for {
 
 		conn, err := ln.Accept()
@@ -101,10 +103,13 @@ func main() {
 		go func(conn_id uint64, conn net.Conn, tls_cfg *tls.Config) {
 			tls_srv := tls.Server(conn, tls_cfg)
 
+			m.Lock()
 			client, err := net.DialTCP("tcp", nil, caddr)
 			if err != nil {
 				log.Fatalf(" (%d) error dialing %v: %v", conn_id, caddr, err)
 			}
+
+			m.Unlock()
 
 			defer func() {
 				client.Close()
