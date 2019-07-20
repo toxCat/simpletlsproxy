@@ -109,6 +109,7 @@ func main() {
 			defer func() {
 				client.Close()
 				tls_srv.Close()
+				conn.Close()
 			}()
 
 			g := sync.WaitGroup{}
