@@ -104,7 +104,8 @@ func main() {
 
 			client, err := net.DialTimeout("tcp", caddr.String(), time.Duration(10*time.Second))
 			if err != nil {
-				log.Fatalf(" (%d) error dialing %v: %v", conn_id, caddr, err)
+				log.Printf(" (%d) error dialing %v: %v", conn_id, caddr, err)
+				return
 			}
 
 			defer func() {
@@ -135,7 +136,7 @@ func main() {
 				}()
 				_, err = io.Copy(client, tls_srv)
 				if err != nil {
-					log.Fatalf(" (%d) error streaming from %v: %v", conn_id, caddr, err)
+					log.Printf(" (%d) error streaming from %v: %v", conn_id, caddr, err)
 				}
 			}()
 
@@ -147,7 +148,7 @@ func main() {
 				}()
 				_, err = io.Copy(tls_srv, client)
 				if err != nil {
-					log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
+					log.Printf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
 				}
 			}()
 
