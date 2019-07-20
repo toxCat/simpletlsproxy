@@ -121,23 +121,6 @@ func main() {
 			// 	log.Printf(" waiting %d end done (still waiting for %d)", conn_id, waiters_count)
 			// }()
 
-			_, err = io.Copy(tls_srv, client)
-			if err != nil {
-				log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
-			}
-
-			// go func() {
-			// 	defer func() {
-			// 		waiters_count -= 1
-			// 		g.Done()
-			// 		log.Printf(" (%d) copier exited client -> tls_srv", conn_id)
-			// 	}()
-			// 	_, err = io.Copy(tls_srv, client)
-			// 	if err != nil {
-			// 		log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
-			// 	}
-			// }()
-
 			_, err = io.Copy(client, tls_srv)
 			if err != nil {
 				log.Fatalf(" (%d) error streaming from %v: %v", conn_id, caddr, err)
@@ -152,6 +135,23 @@ func main() {
 			// 	_, err = io.Copy(client, tls_srv)
 			// 	if err != nil {
 			// 		log.Fatalf(" (%d) error streaming from %v: %v", conn_id, caddr, err)
+			// 	}
+			// }()
+
+			_, err = io.Copy(tls_srv, client)
+			if err != nil {
+				log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
+			}
+
+			// go func() {
+			// 	defer func() {
+			// 		waiters_count -= 1
+			// 		g.Done()
+			// 		log.Printf(" (%d) copier exited client -> tls_srv", conn_id)
+			// 	}()
+			// 	_, err = io.Copy(tls_srv, client)
+			// 	if err != nil {
+			// 		log.Fatalf(" (%d) error streaming to %v: %v", conn_id, caddr, err)
 			// 	}
 			// }()
 
