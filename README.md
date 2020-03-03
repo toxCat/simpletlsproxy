@@ -9,6 +9,9 @@ openssl req -nodes -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 36
 ## write docker-compose.yml
 
 ```docker-compose
+
+version: '3.7'
+
 services:
 
   redmine:
@@ -30,14 +33,6 @@ services:
       - "./mariadb:/var/lib/mysql:z"
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
-  tor:
-    image: jess/tor
-    restart: always
-    user: root
-    volumes:
-      - "./tor_volumes:/hs:z"
-    command: tor --allow-missing-torrc --ignore-missing-torrc HiddenServiceDir /hs HiddenServicePort "443 tls:4433"
-
   tls:
     build: "github.com/AnimusPEXUS/simpletlsproxy.git"
     restart: always
@@ -45,4 +40,16 @@ services:
       - "./tls:/tls:z"
     command: app redmine:3000 :4433
 
+  httpsredirect:
+    build: "https://github.com/AnimusPEXUS/simplehttpsredirect.git"
+    restart: always
+    command: app -s :8080 -n
+
+  tor:
+    image: jess/tor
+    restart: always
+    user: root
+    volumes:
+      - "./tor_volumes:/hs:z"
+    command: tor --allow-missing-torrc --ignore-missing-torrc HiddenServiceDir /hs HiddenServicePort "443 tls:4433" HiddenServicePort "80 httpsredirect:8080"
 ```
