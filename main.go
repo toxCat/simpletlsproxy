@@ -115,8 +115,8 @@ func main() {
 				conn.Close()
 			}()
 
-			tls_srv.SetDeadline(time.Now().Add(30 * time.Second))
-			client.SetDeadline(time.Now().Add(30 * time.Second))
+			// tls_srv.SetDeadline(time.Now().Add(30 * time.Second))
+			// client.SetDeadline(time.Now().Add(30 * time.Second))
 
 			g := sync.WaitGroup{}
 			g.Add(2)
