@@ -3,7 +3,7 @@ FROM golang
 WORKDIR /go/src/app
 COPY . .
 
-RUN go install -v ./...
+RUN go install -v crypto/tls
 
 VOLUME /tls
 
